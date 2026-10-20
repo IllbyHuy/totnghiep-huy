@@ -16,7 +16,7 @@ body{
   background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",sans-serif;
   padding:24px 16px;min-height:100vh;display:flex;justify-content:center;
 }
-.wrap{max-width:800px;width:100%}
+.wrap{max-width:820px;width:100%}
 header{margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:16px}
 h1{font-size:1.5rem;color:var(--leaf);font-weight:700}
 p.sub{font-size:.85rem;color:var(--muted);margin-top:4px}
@@ -29,11 +29,11 @@ h2{font-size:1.15rem;margin-bottom:12px;font-weight:600}
 
 /* CẤU HÌNH LIÊN KẾT */
 .row{display:flex;gap:10px;margin-top:10px}
-input[type="text"]{
-  flex:1;padding:12px 16px;border-radius:12px;border:1px solid var(--line);
-  font-family:inherit;font-size:.95rem;outline:none;transition:border-color .2s;
+input[type="text"],textarea{
+  width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+  font-family:inherit;font-size:.92rem;outline:none;transition:border-color .2s;
 }
-input[type="text"]:focus{border-color:var(--leaf)}
+input[type="text"]:focus,textarea:focus{border-color:var(--leaf)}
 button{
   padding:12px 18px;border-radius:12px;border:0;background:var(--leaf);color:#fff;
   font-family:inherit;font-weight:600;font-size:.9rem;cursor:pointer;transition:opacity .2s;white-space:nowrap;
@@ -66,10 +66,8 @@ th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase}
 .empty-tip{text-align:center;padding:24px 0;color:var(--muted);font-size:.9rem}
 .clear-btn{background:none;border:0;color:var(--muted);font-size:.8rem;text-decoration:underline;cursor:pointer}
 
-.note-box{
-  background:#f9fbf8;border:1px dashed var(--line);border-radius:12px;padding:14px;
-  font-size:.82rem;color:var(--muted);line-height:1.6;margin-top:10px;
-}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:640px){.grid-2{grid-template-columns:1fr}}
 </style>
 </head>
 
@@ -77,13 +75,13 @@ th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase}
 <div class="wrap">
   <header>
     <h1>Trang Quản Lý Thiệp Tốt Nghiệp của Huy</h1>
-    <p class="sub">Tạo link mời riêng cho từng người bạn và theo dõi phản hồi trực tiếp từ Google Sheets.</p>
+    <p class="sub">Tùy chỉnh nội dung thiệp mời, tạo link riêng cho từng người bạn và theo dõi phản hồi.</p>
   </header>
 
-  <!-- MỤC 0: KẾT NỐI GOOGLE SHEETS -->
+  <!-- MỤC 0: KẾT NỐI GOOGLE SHEETS & TÊN MIỀN -->
   <section class="card">
     <h2>⚙️ Kết nối Google Sheets</h2>
-    <p style="font-size:.85rem;color:var(--muted)">Dán link Google Apps Script Web App của bạn vào đây (chỉ cần dán 1 lần duy nhất):</p>
+    <p style="font-size:.85rem;color:var(--muted)">Dán link Google Apps Script Web App của bạn vào đây (link có đuôi /exec):</p>
     <div class="row">
       <input type="text" id="sheetUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
       <button id="btnSaveSheet">Lưu kết nối</button>
@@ -91,13 +89,59 @@ th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase}
     <div id="saveSheetAlert" style="display:none;color:var(--leaf);font-size:.82rem;margin-top:8px;font-weight:600">Đã lưu kết nối Google Sheets thành công!</div>
   </section>
 
-  <!-- MỤC 1: TẠO ĐƯỜNG LINK GỬI CHO BẠN BÈ -->
+  <!-- MỤC 1: CHỈNH SỬA NỘI DUNG THIỆP MỜI (SĐT, GIỜ GIẤC, CHỨC DANH, LỜI NHẮN) -->
+  <section class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <h2>✍️ Chỉnh sửa nội dung thiệp mời</h2>
+      <span style="font-size:.8rem;color:var(--muted)">Nội dung sẽ tự động cập nhật lên thiệp của tất cả bạn bè</span>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:14px">
+      <div>
+        <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:4px">Số điện thoại của Huy:</label>
+        <input type="text" id="cfgPhoneHuy" placeholder="0817 810 177 / 0947 973 036">
+      </div>
+      <div>
+        <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:4px">Số điện thoại hỗ trợ (bạn bè/người thân):</label>
+        <input type="text" id="cfgPhoneSub" placeholder="VD: 0912 345 678 (Bạn Nam)">
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:4px">Khung giờ chi tiết & Lời dặn thời gian:</label>
+      <input type="text" id="cfgTimeNote" placeholder="VD: (Đón khách từ 08:30 - 11:30 sáng)">
+      <span style="font-size:.76rem;color:var(--muted);display:block;margin-top:3px">* Ngày 07/11/2026 và địa điểm FPTU HCM được giữ cố định.</span>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:4px">Chức danh tốt nghiệp:</label>
+      <input type="text" id="cfgRoleTitle" placeholder="Tân kỹ sư công nghệ phần mềm">
+    </div>
+
+    <div style="margin-bottom:14px">
+      <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:4px">Tiêu đề đoạn 2026:</label>
+      <input type="text" id="cfgStoryTitle" placeholder="Hành trình thanh xuân">
+    </div>
+
+    <div style="margin-bottom:16px">
+      <label style="font-size:.82rem;font-weight:600;display:block;margin-bottom:4px">Lời tâm sự tốt nghiệp 2026:</label>
+      <textarea id="cfgStoryText" rows="3" placeholder="Bốn năm đại học khép lại cùng những đồ án và những người bạn đồng hành tuyệt vời..."></textarea>
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button id="btnSaveConfig">💾 Lưu thay đổi nội dung</button>
+      <a href="./" target="_blank" style="font-size:.85rem;color:var(--leaf);text-decoration:underline">Xem thử thiệp ngay ↗</a>
+    </div>
+    <div id="saveConfigAlert" style="display:none;color:var(--leaf);font-size:.82rem;margin-top:10px;font-weight:600">Đã lưu thay đổi nội dung thành công!</div>
+  </section>
+
+  <!-- MỤC 2: TẠO ĐƯỜNG LINK GỬI CHO BẠN BÈ -->
   <section class="card">
     <h2>1. Tạo link mời gửi bạn bè</h2>
     
     <div style="margin-bottom:12px">
       <label style="font-size:.8rem;color:var(--muted);display:block;margin-bottom:4px">Địa chỉ web khi gửi (để trống nếu gửi file local):</label>
-      <input type="text" id="domainInput" placeholder="Ví dụ: https://huytotnghiep.vercel.app (nếu đã deploy)">
+      <input type="text" id="domainInput" placeholder="Ví dụ: https://totnghiep-huy.vercel.app">
     </div>
 
     <label style="font-size:.8rem;color:var(--muted);display:block;margin-bottom:4px">Tên bạn bè:</label>
@@ -115,10 +159,10 @@ th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase}
     </div>
   </section>
 
-  <!-- MỤC 2: DANH SÁCH BẠN BÈ PHẢN HỒI & LỜI NHẮN -->
+  <!-- MỤC 3: DANH SÁCH BẠN BÈ PHẢN HỒI & LỜI NHẮN -->
   <section class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-      <h2>2. Bạn bè phản hồi & Lời nhắn gửi</h2>
+      <h2>3. Bạn bè phản hồi & Lời nhắn gửi</h2>
       <div style="display:flex;gap:8px">
         <button class="outline" id="btnReload" style="padding:7px 14px;font-size:.82rem">Làm mới dữ liệu</button>
       </div>
@@ -156,12 +200,68 @@ th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase}
 <script>
 (function(){
   var $=function(id){return document.getElementById(id)};
-  var inviteFileName='Thư mời tốt nghiệp của Huy.html';
 
-  // 0. Quản lý Google Sheet URL
+  // Cấu hình nội dung mặc định
+  var DEFAULT_CONFIG={
+    phoneHuy:'0817 810 177 / 0947 973 036',
+    phoneSub:'Sẽ cập nhật sau',
+    timeNote:'(Thời gian & khung giờ chi tiết sẽ được cập nhật sớm nhất)',
+    roleTitle:'Tân kỹ sư công nghệ phần mềm',
+    storyTitle:'Hành trình thanh xuân',
+    storyText:'Bốn năm đại học khép lại cùng những đồ án và những người bạn đồng hành tuyệt vời.\nNgày chạm tay vào cột mốc tốt nghiệp, mình mong có bạn cùng sẻ chia khoảnh khắc này.'
+  };
+
+  function fillConfigInputs(cfg){
+    var c=Object.assign({},DEFAULT_CONFIG,cfg||{});
+    $('cfgPhoneHuy').value=c.phoneHuy;
+    $('cfgPhoneSub').value=c.phoneSub;
+    $('cfgTimeNote').value=c.timeNote;
+    $('cfgRoleTitle').value=c.roleTitle;
+    $('cfgStoryTitle').value=c.storyTitle;
+    $('cfgStoryText').value=c.storyText;
+  }
+
+  // Load cấu hình từ localStorage
+  var savedLocalCfg=null;
+  try{
+    savedLocalCfg=JSON.parse(localStorage.getItem('totnghiep_custom_content')||'null');
+  }catch(e){}
+  fillConfigInputs(savedLocalCfg);
+
+  // Lưu cấu hình nội dung
+  $('btnSaveConfig').addEventListener('click',function(){
+    var newCfg={
+      phoneHuy:$('cfgPhoneHuy').value.trim()||DEFAULT_CONFIG.phoneHuy,
+      phoneSub:$('cfgPhoneSub').value.trim()||DEFAULT_CONFIG.phoneSub,
+      timeNote:$('cfgTimeNote').value.trim()||DEFAULT_CONFIG.timeNote,
+      roleTitle:$('cfgRoleTitle').value.trim()||DEFAULT_CONFIG.roleTitle,
+      storyTitle:$('cfgStoryTitle').value.trim()||DEFAULT_CONFIG.storyTitle,
+      storyText:$('cfgStoryText').value.trim()||DEFAULT_CONFIG.storyText
+    };
+
+    // 1. Lưu vào localStorage
+    localStorage.setItem('totnghiep_custom_content',JSON.stringify(newCfg));
+
+    // 2. Gửi lưu lên Google Sheets nếu có link kết nối
+    var sheetUrl=localStorage.getItem('huy_google_sheet_url');
+    if(sheetUrl){
+      fetch(sheetUrl,{
+        method:'POST',
+        mode:'no-cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({action:'save_config',config:newCfg})
+      }).catch(function(){});
+    }
+
+    var al=$('saveConfigAlert');
+    al.style.display='block';
+    setTimeout(function(){al.style.display='none'},2500);
+  });
+
+  // 0. Quản lý Google Sheet URL & Tên miền
   var savedSheetUrl=localStorage.getItem('huy_google_sheet_url')||'';
   $('sheetUrlInput').value=savedSheetUrl;
-  var savedDomain=localStorage.getItem('huy_custom_domain')||'';
+  var savedDomain=localStorage.getItem('huy_custom_domain')||(location.hostname.includes('vercel.app')?location.origin:'');
   $('domainInput').value=savedDomain;
 
   $('btnSaveSheet').addEventListener('click',function(){
@@ -187,11 +287,9 @@ th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase}
     var finalUrl='';
 
     if(domain){
-      // Đã cấu hình domain online -> Tạo link dạng /invite/Tên-Bạn để Zalo/Facebook hiện preview đích danh
       var cleanDomain=domain.replace(/\/+$/,'');
       finalUrl=cleanDomain+'/invite/'+slug;
     }else{
-      // Local path
       var basePath=location.href.substring(0,location.href.lastIndexOf('/')+1);
       finalUrl=basePath+'index.html?ten='+slug;
     }
@@ -222,7 +320,7 @@ th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase}
     }
   });
 
-  // 2. Tải phản hồi: Ưu tiên tải từ Google Sheets nếu có, fallback về LocalStorage
+  // 2. Tải phản hồi: Tải từ Google Sheets nếu có, fallback về LocalStorage
   function renderList(list, fromSource){
     var countYes=0, countNo=0;
     var tbody=$('rsvpBody');
@@ -262,10 +360,14 @@ th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase}
       fetch(sheetUrl)
         .then(function(res){return res.json()})
         .then(function(data){
-          renderList(data,'Đã đồng bộ từ Google Sheets lúc '+new Date().toLocaleTimeString('vi-VN'));
+          var list=Array.isArray(data)?data:(data.list||[]);
+          if(data&&data.config){
+            fillConfigInputs(data.config);
+            try{localStorage.setItem('totnghiep_custom_content',JSON.stringify(data.config))}catch(e){}
+          }
+          renderList(list,'Đã đồng bộ từ Google Sheets lúc '+new Date().toLocaleTimeString('vi-VN'));
         })
         .catch(function(){
-          // Fallback về local nếu mạng lỗi
           var local=JSON.parse(localStorage.getItem('totnghiep_rsvp')||'[]');
           renderList(local,'Lỗi kết nối Google Sheets - Hiển thị dữ liệu tạm trên máy');
         });

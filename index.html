@@ -338,8 +338,8 @@ svg{overflow:visible}
   <!-- ĐOẠN TÂM SỰ TỐT NGHIỆP 2026: ĐÃ ĐƯỢC LÀM GỌN GÀNG, THOÁNG ĐÃNG -->
   <section class="ch grow">
     <p class="yr script rv glitch-text" data-text="2026">2026</p>
-    <h2 class="rv" style="--i:1">Hành trình thanh xuân</h2>
-    <p class="t rv" style="--i:2">
+    <h2 class="rv" style="--i:1" id="storyTitleText">Hành trình thanh xuân</h2>
+    <p class="t rv" style="--i:2" id="storyBodyText">
       Bốn năm đại học khép lại cùng những đồ án và những người bạn đồng hành tuyệt vời.<br>
       Ngày chạm tay vào cột mốc tốt nghiệp, mình mong có bạn cùng sẻ chia khoảnh khắc này.
     </p>
@@ -356,12 +356,12 @@ svg{overflow:visible}
     <section class="fin grow" id="final">
       <p class="cap rv" id="to">Trân trọng kính mời bạn đến</p>
       <h3 class="script rv glitch-text" id="gradTitle" style="--i:1" data-text="Lễ tốt nghiệp của Huy">Lễ tốt nghiệp của Huy</h3>
-      <p class="cap rv" style="--i:2">Tân kỹ sư công nghệ phần mềm</p>
+      <p class="cap rv" style="--i:2" id="roleTitleText">Tân kỹ sư công nghệ phần mềm</p>
       
       <p class="big rv" style="--i:3">
         Lễ diễn ra vào Thứ Bảy, ngày 07 tháng 11 năm 2026, tại Sân trường Đại học FPT TP. Hồ Chí Minh.<br>
         <span class="big-sub">Lô E2a-7, Đường D1, Khu Công nghệ cao, Long Thạnh Mỹ, TP. Thủ Đức, TP. HCM.</span>
-        <span class="big-note">(Thời gian & khung giờ chi tiết sẽ được cập nhật sớm nhất)</span>
+        <span class="big-note" id="timeNoteText">(Thời gian & khung giờ chi tiết sẽ được cập nhật sớm nhất)</span>
         <a href="https://maps.google.com/?q=Trường+Đại+học+FPT+TP.HCM" target="_blank" rel="noopener noreferrer" class="map-text-link">Xem vị trí trên Google Maps</a>
       </p>
 
@@ -380,8 +380,8 @@ svg{overflow:visible}
         <div class="thanks" id="thanks" role="status"></div>
 
         <p class="cap contact-text">
-          Số điện thoại của Huy: <a class="contact-phone" href="tel:0817810177">0817 810 177</a> / <a class="contact-phone" href="tel:0947973036">0947 973 036</a><br>
-          <span style="opacity:.7">Số hỗ trợ: Sẽ cập nhật sau</span>
+          Số điện thoại của Huy: <span id="phoneHuyText"><a class="contact-phone" href="tel:0817810177">0817 810 177</a> / <a class="contact-phone" href="tel:0947973036">0947 973 036</a></span><br>
+          <span style="opacity:.7">Số hỗ trợ: <span id="phoneSubText">Sẽ cập nhật sau</span></span>
         </p>
       </div>
 
@@ -757,6 +757,47 @@ svg{overflow:visible}
   $('yes').addEventListener('click',function(){reply(true)});
   $('no').addEventListener('click',function(){reply(false)});
   $('again').addEventListener('click',function(){location.reload()});
+
+  // ---- 10. ĐỒNG BỘ NỘI DUNG TÙY CHỈNH TỪ TRANG QUẢN LÝ / GOOGLE SHEETS ----
+  function applyCustomConfig(cfg){
+    if(!cfg)return;
+    if(cfg.timeNote&&$('timeNoteText')) $('timeNoteText').textContent=cfg.timeNote;
+    if(cfg.roleTitle&&$('roleTitleText')) $('roleTitleText').textContent=cfg.roleTitle;
+    if(cfg.storyTitle&&$('storyTitleText')) $('storyTitleText').textContent=cfg.storyTitle;
+    if(cfg.storyText&&$('storyBodyText')) $('storyBodyText').innerHTML=cfg.storyText.replace(/\n/g,'<br>');
+    if(cfg.phoneHuy&&$('phoneHuyText')){
+      var parts=cfg.phoneHuy.split(/[\/\,\-]+/).map(function(p){return p.trim()}).filter(Boolean);
+      if(parts.length>0){
+        $('phoneHuyText').innerHTML=parts.map(function(p){
+          var clean=p.replace(/[^0-9\+]/g,'');
+          return '<a class="contact-phone" href="tel:'+clean+'">'+p+'</a>';
+        }).join(' / ');
+      }else{
+        $('phoneHuyText').textContent=cfg.phoneHuy;
+      }
+    }
+    if(cfg.phoneSub&&$('phoneSubText')) $('phoneSubText').textContent=cfg.phoneSub;
+  }
+
+  // Nạp từ cache máy nếu có
+  try{
+    var localCfg=JSON.parse(localStorage.getItem('totnghiep_custom_content')||'null');
+    if(localCfg) applyCustomConfig(localCfg);
+  }catch(e){}
+
+  // Kéo cấu hình mới nhất từ Google Sheets nếu có link kết nối
+  var currentSheetUrl=localStorage.getItem('huy_google_sheet_url')||window.HUY_SHEET_URL||'';
+  if(currentSheetUrl){
+    var fetchUrl=currentSheetUrl+(currentSheetUrl.indexOf('?')===-1?'?':'&')+'action=get_config';
+    fetch(fetchUrl)
+      .then(function(res){return res.json()})
+      .then(function(data){
+        if(data&&data.config){
+          applyCustomConfig(data.config);
+          try{localStorage.setItem('totnghiep_custom_content',JSON.stringify(data.config))}catch(e){}
+        }
+      }).catch(function(){});
+  }
 })();
 </script>
 </body>
