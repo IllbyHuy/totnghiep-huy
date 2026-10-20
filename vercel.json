@@ -1,0 +1,6 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/invite/:name", "destination": "/api/invite?name=:name" }
+  ]
+}

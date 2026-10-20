@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bảng Quản Lý Thư Mời - Huy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f6f2;--card:#ffffff;--ink:#1f2e24;--muted:#687c6e;--leaf:#406b32;--line:#e0e7dd;--mint:#eaf2e8;--red:#c25050;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);font-family:"Be Vietnam Pro",sans-serif;
+  padding:24px 16px;min-height:100vh;display:flex;justify-content:center;
+}
+.wrap{max-width:800px;width:100%}
+header{margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:16px}
+h1{font-size:1.5rem;color:var(--leaf);font-weight:700}
+p.sub{font-size:.85rem;color:var(--muted);margin-top:4px}
+
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:22px;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,.02);
+}
+h2{font-size:1.15rem;margin-bottom:12px;font-weight:600}
+
+/* CẤU HÌNH LIÊN KẾT */
+.row{display:flex;gap:10px;margin-top:10px}
+input[type="text"]{
+  flex:1;padding:12px 16px;border-radius:12px;border:1px solid var(--line);
+  font-family:inherit;font-size:.95rem;outline:none;transition:border-color .2s;
+}
+input[type="text"]:focus{border-color:var(--leaf)}
+button{
+  padding:12px 18px;border-radius:12px;border:0;background:var(--leaf);color:#fff;
+  font-family:inherit;font-weight:600;font-size:.9rem;cursor:pointer;transition:opacity .2s;white-space:nowrap;
+}
+button:hover{opacity:.9}
+button.outline{background:transparent;color:var(--leaf);border:1px solid var(--leaf)}
+
+.result-box{
+  display:none;margin-top:16px;padding:14px;background:var(--mint);
+  border-radius:12px;border:1px solid #d5e5d3;font-size:.88rem;word-break:break-all;
+}
+.result-box.on{display:block}
+.result-links{margin-top:10px;display:flex;gap:8px}
+
+/* DANH SÁCH PHẢN HỒI */
+.stats{display:flex;gap:12px;margin-bottom:16px}
+.stat-pill{
+  flex:1;background:var(--mint);padding:12px 14px;border-radius:12px;
+  text-align:center;font-size:.82rem;color:var(--muted);
+}
+.stat-pill b{display:block;font-size:1.45rem;color:var(--leaf);font-weight:700;margin-top:2px}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem;text-align:left}
+th,td{padding:12px 10px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase}
+.status-yes{display:inline-block;padding:3px 10px;border-radius:999px;background:#e2f2df;color:#2c6b22;font-weight:600;font-size:.8rem}
+.status-no{display:inline-block;padding:3px 10px;border-radius:999px;background:#f8e6e6;color:var(--red);font-weight:600;font-size:.8rem}
+
+.empty-tip{text-align:center;padding:24px 0;color:var(--muted);font-size:.9rem}
+.clear-btn{background:none;border:0;color:var(--muted);font-size:.8rem;text-decoration:underline;cursor:pointer}
+
+.note-box{
+  background:#f9fbf8;border:1px dashed var(--line);border-radius:12px;padding:14px;
+  font-size:.82rem;color:var(--muted);line-height:1.6;margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <header>
+    <h1>Trang Quản Lý Thiệp Tốt Nghiệp của Huy</h1>
+    <p class="sub">Tạo link mời riêng cho từng người bạn và theo dõi phản hồi trực tiếp từ Google Sheets.</p>
+  </header>
+
+  <!-- MỤC 0: KẾT NỐI GOOGLE SHEETS -->
+  <section class="card">
+    <h2>⚙️ Kết nối Google Sheets</h2>
+    <p style="font-size:.85rem;color:var(--muted)">Dán link Google Apps Script Web App của bạn vào đây (chỉ cần dán 1 lần duy nhất):</p>
+    <div class="row">
+      <input type="text" id="sheetUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+      <button id="btnSaveSheet">Lưu kết nối</button>
+    </div>
+    <div id="saveSheetAlert" style="display:none;color:var(--leaf);font-size:.82rem;margin-top:8px;font-weight:600">Đã lưu kết nối Google Sheets thành công!</div>
+  </section>
+
+  <!-- MỤC 1: TẠO ĐƯỜNG LINK GỬI CHO BẠN BÈ -->
+  <section class="card">
+    <h2>1. Tạo link mời gửi bạn bè</h2>
+    
+    <div style="margin-bottom:12px">
+      <label style="font-size:.8rem;color:var(--muted);display:block;margin-bottom:4px">Địa chỉ web khi gửi (để trống nếu gửi file local):</label>
+      <input type="text" id="domainInput" placeholder="Ví dụ: https://huytotnghiep.vercel.app (nếu đã deploy)">
+    </div>
+
+    <label style="font-size:.8rem;color:var(--muted);display:block;margin-bottom:4px">Tên bạn bè:</label>
+    <div class="row" style="margin-top:0">
+      <input type="text" id="guestNameInput" placeholder="Ví dụ: Thái An, Bé Thư, v.v...">
+      <button id="genBtn">Tạo & Sao chép Link</button>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div><strong>Link mời của bạn bè:</strong> <span id="linkDisplay" style="color:var(--leaf);font-weight:600"></span></div>
+      <div class="result-links">
+        <button id="btnCopyAgain" style="padding:7px 14px;font-size:.82rem">Sao chép lại</button>
+        <button class="outline" id="btnTestOpen" style="padding:7px 14px;font-size:.82rem">Mở xem thử</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MỤC 2: DANH SÁCH BẠN BÈ PHẢN HỒI & LỜI NHẮN -->
+  <section class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <h2>2. Bạn bè phản hồi & Lời nhắn gửi</h2>
+      <div style="display:flex;gap:8px">
+        <button class="outline" id="btnReload" style="padding:7px 14px;font-size:.82rem">Làm mới dữ liệu</button>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-pill">Sẽ tham dự<b id="countYes">0</b></div>
+      <div class="stat-pill">Bận mất rồi<b id="countNo" style="color:var(--muted)">0</b></div>
+      <div class="stat-pill">Tổng phản hồi<b id="countTotal" style="color:var(--ink)">0</b></div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tên bạn bè</th>
+            <th>Trạng thái</th>
+            <th>Lời nhắn gửi</th>
+            <th>Thời gian</th>
+          </tr>
+        </thead>
+        <tbody id="rsvpBody">
+          <tr><td colspan="4" class="empty-tip">Đang tải dữ liệu...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
+      <button class="clear-btn" id="btnClearLocal">Xóa cache tạm trên máy</button>
+      <span id="syncStatus" style="font-size:.8rem;color:var(--muted)"></span>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var inviteFileName='Thư mời tốt nghiệp của Huy.html';
+
+  // 0. Quản lý Google Sheet URL
+  var savedSheetUrl=localStorage.getItem('huy_google_sheet_url')||'';
+  $('sheetUrlInput').value=savedSheetUrl;
+  var savedDomain=localStorage.getItem('huy_custom_domain')||'';
+  $('domainInput').value=savedDomain;
+
+  $('btnSaveSheet').addEventListener('click',function(){
+    var url=$('sheetUrlInput').value.trim();
+    localStorage.setItem('huy_google_sheet_url',url);
+    var alertEl=$('saveSheetAlert');
+    alertEl.style.display='block';
+    setTimeout(function(){alertEl.style.display='none'},2000);
+    loadRSVP();
+  });
+
+  $('domainInput').addEventListener('change',function(){
+    localStorage.setItem('huy_custom_domain',this.value.trim());
+  });
+
+  // 1. Tạo Link gửi bạn bè
+  $('genBtn').addEventListener('click',function(){
+    var name=$('guestNameInput').value.trim();
+    if(!name){alert('Bạn hãy nhập tên bạn bè trước nhé!');return}
+
+    var slug=encodeURIComponent(name.replace(/\s+/g,'-'));
+    var domain=$('domainInput').value.trim();
+    var finalUrl='';
+
+    if(domain){
+      // Đã cấu hình domain online -> Tạo link dạng /invite/Tên-Bạn để Zalo/Facebook hiện preview đích danh
+      var cleanDomain=domain.replace(/\/+$/,'');
+      finalUrl=cleanDomain+'/invite/'+slug;
+    }else{
+      // Local path
+      var basePath=location.href.substring(0,location.href.lastIndexOf('/')+1);
+      finalUrl=basePath+'index.html?ten='+slug;
+    }
+
+    $('linkDisplay').textContent=finalUrl;
+    $('resultBox').classList.add('on');
+
+    navigator.clipboard.writeText(finalUrl).then(function(){
+      alert('Đã tạo và sao chép link mời bạn "'+name+'"!\nBạn có thể dán vào khung chat Zalo/Messenger gửi ngay.');
+    }).catch(function(){
+      prompt('Hãy copy link dưới đây:',finalUrl);
+    });
+  });
+
+  $('btnCopyAgain').addEventListener('click',function(){
+    var link=$('linkDisplay').textContent;
+    if(link){
+      navigator.clipboard.writeText(link).then(function(){
+        alert('Đã copy lại link!');
+      });
+    }
+  });
+
+  $('btnTestOpen').addEventListener('click',function(){
+    var link=$('linkDisplay').textContent;
+    if(link){
+      window.open(link,'_blank');
+    }
+  });
+
+  // 2. Tải phản hồi: Ưu tiên tải từ Google Sheets nếu có, fallback về LocalStorage
+  function renderList(list, fromSource){
+    var countYes=0, countNo=0;
+    var tbody=$('rsvpBody');
+
+    if(!list||list.length===0){
+      tbody.innerHTML='<tr><td colspan="4" class="empty-tip">Chưa có phản hồi nào được ghi nhận.</td></tr>';
+      $('countYes').textContent=0;
+      $('countNo').textContent=0;
+      $('countTotal').textContent=0;
+      $('syncStatus').textContent=fromSource;
+      return;
+    }
+
+    var html='';
+    list.slice().reverse().forEach(function(item){
+      var isYes=item.status==='Sẽ tham dự'||item.status==='Mình sẽ đến';
+      if(isYes) countYes++; else countNo++;
+      html+='<tr>'+
+        '<td><strong>'+(item.name||'Bạn bè')+'</strong></td>'+
+        '<td><span class="'+(isYes?'status-yes':'status-no')+'">'+item.status+'</span></td>'+
+        '<td>'+(item.message||'<span style="color:var(--muted);font-style:italic">Không có lời chúc</span>')+'</td>'+
+        '<td style="color:var(--muted);font-size:.8rem">'+(item.time||'-')+'</td>'+
+      '</tr>';
+    });
+
+    tbody.innerHTML=html;
+    $('countYes').textContent=countYes;
+    $('countNo').textContent=countNo;
+    $('countTotal').textContent=list.length;
+    $('syncStatus').textContent=fromSource;
+  }
+
+  function loadRSVP(){
+    var sheetUrl=localStorage.getItem('huy_google_sheet_url');
+    if(sheetUrl){
+      $('syncStatus').textContent='Đang đồng bộ từ Google Sheets...';
+      fetch(sheetUrl)
+        .then(function(res){return res.json()})
+        .then(function(data){
+          renderList(data,'Đã đồng bộ từ Google Sheets lúc '+new Date().toLocaleTimeString('vi-VN'));
+        })
+        .catch(function(){
+          // Fallback về local nếu mạng lỗi
+          var local=JSON.parse(localStorage.getItem('totnghiep_rsvp')||'[]');
+          renderList(local,'Lỗi kết nối Google Sheets - Hiển thị dữ liệu tạm trên máy');
+        });
+    }else{
+      var local=JSON.parse(localStorage.getItem('totnghiep_rsvp')||'[]');
+      renderList(local,'Dữ liệu lưu tạm trên máy (Hãy dán link Google Sheets ở mục trên)');
+    }
+  }
+
+  $('btnReload').addEventListener('click',loadRSVP);
+  loadRSVP();
+
+  $('btnClearLocal').addEventListener('click',function(){
+    if(confirm('Xóa dữ liệu lưu tạm trên trình duyệt máy này? (Dữ liệu trên Google Sheet của bạn sẽ không bị mất)')){
+      localStorage.removeItem('totnghiep_rsvp');
+      loadRSVP();
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
