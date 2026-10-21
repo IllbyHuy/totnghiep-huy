@@ -114,16 +114,54 @@ svg{overflow:visible}
 /* HOA LÁ SVG ANIMATION */
 .lf{animation:grow 1s cubic-bezier(.2,1.25,.4,1) backwards paused}
 .stem{animation:draw 1.8s ease-out backwards paused}
-.sw{animation:sway 8s ease-in-out infinite alternate}
+.sw{animation:sway 5s ease-in-out infinite alternate}
 .go .lf,.go .stem,.go .ink{animation-play-state:running}
 @keyframes grow{from{transform:scale(0)}}
 @keyframes draw{from{stroke-dasharray:1;stroke-dashoffset:1}to{stroke-dasharray:1;stroke-dashoffset:0}}
-@keyframes sway{from{transform:rotate(-1.4deg)}to{transform:rotate(1.4deg)}}
+@keyframes sway{from{transform:rotate(-3.5deg) translateX(-2px)}to{transform:rotate(3.5deg) translateX(2px)}}
 
-.blob{position:absolute;z-index:0;border-radius:58% 42% 61% 39%/47% 55% 45% 53%;background:var(--bg2);opacity:.75;pointer-events:none;animation:morph 14s ease-in-out infinite alternate}
-.b1{width:min(70vw,560px);aspect-ratio:1;left:18%;top:10%}.b2{width:min(60vw,460px);aspect-ratio:1;right:14%;bottom:6%;background:var(--bg1);opacity:.4;animation-delay:-6s}
-.b3{width:min(80vw,620px);aspect-ratio:1;left:50%;margin-left:-310px;top:6%;opacity:.55}
-@keyframes morph{to{border-radius:42% 58% 39% 61%/55% 45% 53% 47%;transform:translate(14px,-10px) rotate(8deg)}}
+/* BONG BÓNG LƠ LỬNG (FLOATING BUBBLES) */
+.blob{
+  position:absolute;z-index:0;pointer-events:none;
+  border-radius:58% 42% 61% 39%/47% 55% 45% 53%;
+  background:var(--bg2);
+  filter:blur(1px);
+  animation:blobMorph 12s ease-in-out infinite alternate,
+            blobFloat 7s ease-in-out infinite,
+            blobBreath 5s ease-in-out infinite alternate;
+}
+.b1{
+  width:min(70vw,560px);aspect-ratio:1;left:18%;top:10%;
+  opacity:.6;
+  animation-delay:0s, 0s, 0s;
+}
+.b2{
+  width:min(60vw,460px);aspect-ratio:1;right:14%;bottom:6%;
+  background:var(--bg1);opacity:.35;
+  animation-delay:-4s, -2.5s, -1.5s;
+}
+.b3{
+  width:min(80vw,620px);aspect-ratio:1;left:50%;margin-left:-310px;top:6%;
+  opacity:.45;
+  animation-delay:-8s, -4s, -3s;
+}
+@keyframes blobMorph{
+  0%{border-radius:58% 42% 61% 39%/47% 55% 45% 53%;transform:rotate(0deg) scale(1)}
+  33%{border-radius:45% 55% 50% 50%/60% 40% 60% 40%;transform:rotate(4deg) scale(1.03)}
+  66%{border-radius:50% 50% 42% 58%/42% 58% 50% 50%;transform:rotate(-3deg) scale(.97)}
+  100%{border-radius:42% 58% 39% 61%/55% 45% 53% 47%;transform:rotate(6deg) scale(1.02)}
+}
+@keyframes blobFloat{
+  0%{translate:0 0}
+  25%{translate:8px -18px}
+  50%{translate:-4px -10px}
+  75%{translate:10px -22px}
+  100%{translate:0 0}
+}
+@keyframes blobBreath{
+  0%{opacity:var(--blob-o,0.6);filter:blur(1px)}
+  100%{opacity:calc(var(--blob-o,0.6) - 0.12);filter:blur(2.5px)}
+}
 .sk{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.sk.f{fill:var(--paper)}
 .ink{animation:draw 1.8s ease-out backwards paused}
 .fade{animation:fade 1s 1.9s backwards paused}.go .fade{animation-play-state:running}
