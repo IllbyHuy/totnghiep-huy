@@ -69,6 +69,7 @@ th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media (max-width:640px){.grid-2{grid-template-columns:1fr}}
 </style>
+<script>window.HUY_SHEET_URL='https://script.google.com/macros/s/AKfycbyw-zA-bd89JXxCEpn5WawBsUHh8YC463vaczZahL6n7WeDDDCcM-VegXehBe_pX-7-/exec';</script>
 </head>
 
 <body>
@@ -243,7 +244,7 @@ th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase}
     localStorage.setItem('totnghiep_custom_content',JSON.stringify(newCfg));
 
     // 2. Gửi lưu lên Google Sheets nếu có link kết nối
-    var sheetUrl=localStorage.getItem('huy_google_sheet_url');
+    var sheetUrl=(localStorage.getItem('huy_google_sheet_url')||window.HUY_SHEET_URL||'');
     if(sheetUrl){
       fetch(sheetUrl,{
         method:'POST',
@@ -259,7 +260,7 @@ th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase}
   });
 
   // 0. Quản lý Google Sheet URL & Tên miền
-  var savedSheetUrl=localStorage.getItem('huy_google_sheet_url')||'';
+  var savedSheetUrl=(localStorage.getItem('huy_google_sheet_url')||window.HUY_SHEET_URL||'')||'';
   $('sheetUrlInput').value=savedSheetUrl;
   var savedDomain=localStorage.getItem('huy_custom_domain')||(location.hostname.includes('vercel.app')?location.origin:'');
   $('domainInput').value=savedDomain;
@@ -354,7 +355,7 @@ th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase}
   }
 
   function loadRSVP(){
-    var sheetUrl=localStorage.getItem('huy_google_sheet_url');
+    var sheetUrl=(localStorage.getItem('huy_google_sheet_url')||window.HUY_SHEET_URL||'');
     if(sheetUrl){
       $('syncStatus').textContent='Đang đồng bộ từ Google Sheets...';
       fetch(sheetUrl)
