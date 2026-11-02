@@ -1045,6 +1045,65 @@
       }
     }
 
+    /* ===== ẢNH CHÂN DUNG TỐT NGHIỆP ===== */
+    .photo {
+      position: relative;
+      z-index: 2;
+      padding: 10vh 20px 12vh;
+      text-align: center;
+      overflow: hidden
+    }
+
+    .photo h3 {
+      margin: 6px 0 4px;
+      font-size: clamp(2.4rem, 9vw, 3.4rem);
+      line-height: 1.1
+    }
+
+    .photo-wrap {
+      position: relative;
+      width: min(92vw, 560px);
+      aspect-ratio: 1;
+      margin: 10px auto 0;
+      display: grid;
+      place-items: center
+    }
+
+    .photo-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: var(--bg2);
+      opacity: .85
+    }
+
+    .arch {
+      position: relative;
+      width: 56%;
+      aspect-ratio: 3/4.2;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 999px 999px 16px 16px;
+      box-shadow: 0 24px 40px -22px rgba(30, 70, 40, .45)
+    }
+
+    .arch img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      border-radius: 999px 999px 8px 8px
+    }
+
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) .arch {
+        background: var(--paper)
+      }
+    }
+
     /* ===== GẠCH VÀNG + THẺ THÔNG TIN ===== */
     .orn {
       display: block;
@@ -1351,6 +1410,24 @@
         <path class="sk ink" pathLength="1" style="animation-delay:.6s"
           d="M104 12Q118 0 130 12Q142 24 156 12M130 12V5M130 12V19M118 12Q122 5 128 9M142 12Q138 5 132 9" />
       </svg>
+    </section>
+
+    <!-- ẢNH CHÂN DUNG TỐT NGHIỆP -->
+    <section class="photo grow">
+      <p class="cap rv">Trân trọng lưu giữ khoảnh khắc</p>
+      <h3 class="script rv" style="--i:1">Ngày tốt nghiệp của Huy</h3>
+      <p class="cap rv" style="--i:2">Tân kỹ sư công nghệ phần mềm</p>
+      <svg class="orn grow" viewBox="0 0 260 24" aria-hidden="true">
+        <path class="sk ink" pathLength="1" d="M0 12H100" />
+        <path class="sk ink" pathLength="1" style="animation-delay:.3s" d="M160 12H260" />
+        <path class="sk ink" pathLength="1" style="animation-delay:.6s"
+          d="M104 12Q118 0 130 12Q142 24 156 12M130 12V5M130 12V19M118 12Q122 5 128 9M142 12Q138 5 132 9" />
+      </svg>
+      <div class="photo-wrap rv" style="--i:3">
+        <div class="arch">
+          <img src="SE183811.jpg" alt="Huy trong ngày tốt nghiệp" loading="lazy" decoding="async">
+        </div>
+      </div>
     </section>
 
     <!-- THÔNG TIN LỄ TỐT NGHIỆP & PHẢN HỒI (GIỮ TRỌN VẸN GIAO DIỆN THANH LỊCH GỐC) -->
@@ -1766,7 +1843,7 @@
       var io = new IntersectionObserver(function (es) {
         es.forEach(function (e) {
           if (!e.isIntersecting) return; var el = e.target; el.classList.add('go');
-          if (el.classList.contains('ch') || el.classList.contains('fin')) el.classList.add('in');
+          if (el.classList.contains('ch') || el.classList.contains('fin') || el.classList.contains('photo')) el.classList.add('in');
           if (el.id === 'final' && !fired) { fired = true; setTimeout(function () { burst(innerWidth * .2, innerHeight * .4, 40); burst(innerWidth * .8, innerHeight * .4, 40) }, 900) }
           io.unobserve(el);
         })
